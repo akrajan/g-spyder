@@ -5,8 +5,9 @@
 
 (defn run-with-new-driver [action]
   (let [driver (new-driver {})]
-    (tap [res (action driver)]
-         (close driver))))
+    (try
+      (action driver)
+      (finally (close driver)))))
 
 
 (defmacro with-new-driver [[name] & body]
@@ -26,7 +27,10 @@
        ~@body))))
 
 
-
-
-
-
+(defmacro ->driver [driver & body]
+  `(do
+     ~@(map (fn [sexp]
+              (if (symbol? sexp)
+                (list sexp driver)
+                (concat (list (first sexp)) (list driver) (rest sexp))))
+          body)))
