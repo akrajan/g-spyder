@@ -13,3 +13,20 @@
   `(run-with-new-driver
     (fn [~name]
       ~@body)))
+
+
+(defmacro def-driver-fn [fn-name [driver & args :as full-args] & body]
+  (let [args (vec args)
+        full-args (vec full-args)]
+   `(defn ~fn-name
+      (~args
+       (with-new-driver [~driver]
+         (~fn-name ~@full-args)))
+      (~full-args
+       ~@body))))
+
+
+
+
+
+
