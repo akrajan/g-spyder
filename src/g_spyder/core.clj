@@ -1,12 +1,12 @@
 (ns g-spyder.core
-  (:use clj-webdriver.taxi)
+  (:use clj-webdriver.taxi
+        g-spyder.driver-utils)
   (:require [clojure.string :as string]))
 
 (defn open-all-items []
   (when (find-element {:css ".pagination .button"})
     (click ".pagination .button")
     (recur)))
-
 
 (defn get-name [driver]
   (string/trim (attribute driver ".deal_title h2 a" :text)))
@@ -20,10 +20,8 @@
 
 (defn get-deal
   ([url]
-     (let [d (new-driver {})
-           res (get-deal d url)]
-       (close d)
-       res))
+     (with-new-driver [driver]
+       (get-deal driver url)))
   ([driver url]
      (to driver url)
      (let [name (get-name driver)
@@ -38,30 +36,19 @@
   (let [anchors (css-finder driver "#browse-deals .deal-list-tile .deal-permalink")]
     (doall (map #(attribute % :href) anchors))))
 
-(defn run-with-new-driver [func]
-  (let [d (new-driver {})
-        res (func d)]
-    (close d)
-    res))
 
 (defn get-deal-listing
   ([url]
-     ;; (run-with-new-driver 
-     ;;  #(get-deal-listing (new-driver {}) url))
-     (let [d (new-driver {})
-           res (get-deal-listing d url)]
-       (close d)
-       res))
+     (with-new-driver [driver]
+       (get-deal-listing driver url)))
   ([driver url]
      (to driver url)
      (get-deal-urls driver)))
 
 (defn do-crawl
   ([]
-     (let [d (new-driver {})
-           res (do-crawl d)]
-       (close d)
-       res))
+     (with-new-driver [driver]
+       (do-crawl driver)))
   ([driver]
      (let [deal-permalinks (get-deal-listing driver "http://www.groupon.com/browse/seattle?category=home-and-auto")
            deal-permalinks (take 3 deal-permalinks)
