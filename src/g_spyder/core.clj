@@ -36,9 +36,13 @@
 
 (def-driver-fn do-crawl [driver]
    (let [deal-permalinks (get-deal-listing driver "http://www.groupon.com/browse/seattle?category=home-and-auto")
-         deal-permalinks (take 1 deal-permalinks)
-         deals-futures (map #(future (get-deal %)) deal-permalinks)
-         deal-info (map deref deals-futures)]
+         ;; deal-permalinks (take 1 deal-permalinks)
+         deals-futures (map (fn [deal-url number]
+                              (log-as (str number ". " deal-url)
+                                      (future (get-deal deal-url))))
+                            deal-permalinks
+                            (range))
+         deal-info (doall (map deref deals-futures))]
      (process deal-info)))
 
 

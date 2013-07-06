@@ -5,36 +5,37 @@
 
 (defn get-name [driver]
   (log-as "get-name"
-          (string/trim (attribute? driver ".deal_title h2 a" :text))))
+          (css-attribute? driver ".deal_title h2 a" :text)))
 
 
 (defn get-price [driver]
   (log-as "get-price"
-          (string/trim (attribute? driver (first (xpath-finder driver "//span[@itemprop='price']")) :text))))
+          (xpath-attribute? driver "//span[@itemprop='price']" :text)))
 
 (defn get-subtitle [driver]
   (log-as "get-subtitle"
-          (string/trim (attribute? driver ".deal_title .subtitle" :text))))
+          (css-attribute? driver ".deal_title .subtitle" :text)))
 
 (defn get-tags [driver]
   (log-as "get-tags"
-          (map #(string/trim (attribute driver % :text)) (css-finder driver ".deal_tags em"))))
+          (map #(attribute?-trim driver % :text) (css-finder driver ".deal_tags em"))))
 
 (defn get-bought [driver]
   (log-as "get-bought"
-          (string/trim (attribute? driver ".bought_message" :text))))
+          (css-attribute? driver ".bought_message" :text)))
 
 (defn get-company-links [driver]
   (log-as "get-company-links"
-          (map #(string/trim (attribute? driver % :href)) (css-finder driver "#company_box .company_links a"))))
+          (all-css-attribute? driver "#company_box .company_links a" :href)))
 
 (defn get-company-name [driver]
   (log-as "get-company-name"
-          (string/trim (attribute? driver (first (css-finder driver "#company_box .name")) :text))))
+          (css-attribute? driver "#company_box .name" :text)))
 
 (defn get-address [driver]
   (log-as "get-address"
-          (string/trim (attribute? driver ".address [itemprop=streetAddress]" :text))))
+          (when-let [addr (css-attribute? driver ".address [itemprop=streetAddress]" :text)]
+            (string/replace-first addr "\nGet Directions" ""))))
 
 (defn parse-deal [driver]
   (let [deal-name (get-name driver)

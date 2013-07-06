@@ -1,6 +1,7 @@
 (ns g-spyder.driver-utils
   (:use clj-webdriver.taxi
-        g-spyder.utils))
+        g-spyder.utils)
+  (:require [clojure.string :as string]))
 
 
 (defn run-with-new-driver [action]
@@ -37,3 +38,18 @@
 
 (defn attribute? [driver elem attr]
   (when elem (attribute driver elem attr)))
+
+(defn attribute?-trim [driver elem attr]
+  (when-let [val (attribute? driver elem attr)]
+    (string/trim val)))
+
+(defn css-attribute? [driver selector attr]
+  (when-let [elem (first (css-finder driver selector))]
+    (attribute?-trim driver elem attr)))
+
+(defn all-css-attribute? [driver selector attr]
+  (map #(attribute?-trim driver % attr) (css-finder driver selector)))
+
+(defn xpath-attribute? [driver selector attr]
+  (when-let [elem (first (xpath-finder driver selector))]
+    (attribute?-trim driver elem attr)))
