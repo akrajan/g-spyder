@@ -11,11 +11,6 @@
   (to driver url)
   (groupon-deal/parse-deal driver))
 
-(defn expose-all-deals [driver]
-  (when (find-element driver {:css ".pagination .button"})
-    (click driver ".pagination .button")
-    (recur driver)))
-
 (def-driver-fn get-deal-listing [driver url]
   (->driver driver
             (to url)

@@ -2,8 +2,6 @@
   (:use clj-webdriver.taxi)
   (:require [clojure.string :as string]))
 
-
-
 (defn expose-all-deals [driver]
   (when (find-element driver {:css ".pagination .button"})
     (click driver ".pagination .button")
@@ -14,7 +12,7 @@
     (doall (map #(attribute % :href) anchors))))
 
 
-(defn get-deal-urls
+(defn get-deal-urls [driver]
   (expose-all-deals driver)
   (parse-deal-urls driver))
 
