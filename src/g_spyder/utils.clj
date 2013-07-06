@@ -22,7 +22,7 @@
      ~binding))
 
 
-(defmacro as-log [log-str & body]
+(defmacro log-as [log-str & body]
   `(do
      (println "Starting: " ~log-str)
       (let [res# (do ~@body)]
