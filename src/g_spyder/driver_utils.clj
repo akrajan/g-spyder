@@ -34,3 +34,6 @@
                 (list sexp driver)
                 (concat (list (first sexp)) (list driver) (rest sexp))))
           body)))
+
+(defn attribute? [driver elem attr]
+  (when elem (attribute driver elem attr)))
