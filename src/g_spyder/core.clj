@@ -34,15 +34,27 @@
   (log-as "process"
           ((persist-deal-info "mytest") deal-info)))
 
+(defn redefine-state []
+  (def current-deals (atom ()))
+  (def deal-infos (atom ())))
+
+(def-driver-fn crawl-deal-futures [driver permalinks]
+  (map (fn [deal-url number]
+         (log-as (str number ". " deal-url)
+                 (future
+                   (tap [current-info (get-deal driver deal-url)]
+                        (swap! deal-infos conj current-info)))))
+       permalinks
+       (range)))
+
 (def-driver-fn do-crawl [driver]
    (let [deal-permalinks (get-deal-listing driver "http://www.groupon.com/browse/seattle?category=home-and-auto")
          ;; deal-permalinks (take 1 deal-permalinks)
-         deals-futures (map (fn [deal-url number]
-                              (log-as (str number ". " deal-url)
-                                      (future (get-deal deal-url))))
-                            deal-permalinks
-                            (range))
+         _ (reset! current-deals deal-permalinks)
+         deal-browser (new-driver {})
+         deals-futures (crawl-deal-futures deal-permalinks)
          deal-info (doall (map deref deals-futures))]
+     (.close deal-browser)
      (process deal-info)))
 
 
